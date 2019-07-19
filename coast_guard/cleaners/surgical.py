@@ -13,77 +13,78 @@ class SurgicalScrubCleaner(cleaners.BaseCleaner):
     description = 'De-weight profiles that stand out compared to others ' \
                     'in the same subint/channel using multiple stats.'
 
-
     def _set_config_params(self):
         self.configs.add_param('chanthresh', config_types.FloatVal, \
-                         aliases=['cthresh'], \
-                         help='The threshold (in number of sigmas) a ' \
-                                'profile needs to stand out compared to ' \
-                                'others in the same channel for it to ' \
-                                'be removed.')
+                               aliases=['cthresh'], \
+                               help='The threshold (in number of sigma) a ' \
+                                    'profile needs to stand out compared to ' \
+                                    'others in the same channel for it to ' \
+                                    'be removed.')
         self.configs.add_param('subintthresh', config_types.FloatVal, \
-                         aliases=['sthresh'], \
-                         help='The threshold (in number of sigmas) a ' \
-                                'profile needs to stand out compared to ' \
-                                'others in the same sub-int for it to ' \
-                                'be removed.')
+                               aliases=['sthresh'], \
+                               help='The threshold (in number of sigma) a ' \
+                                    'profile needs to stand out compared to ' \
+                                    'others in the same sub-int for it to ' \
+                                    'be removed.')
         self.configs.add_param('chan_order', config_types.IntList, \
-                        aliases=['corder', 'chanorder'], \
-                        help='The order of polynomial to remove from piecewise ' \
-                                'segements of each channel. Multiple values ' \
-                                'will cause channels to be detrended multiple ' \
-                                'times in sequence, each time with the next ' \
-                                'parameter.')
+                               aliases=['corder', 'chanorder'], \
+                               help='The order of polynomial to remove from ' \
+                                    'piecewise segments of each channel. Multiple ' \
+                                    'values will cause channels to be de-trended ' \
+                                    'multiple times in sequence, each time with ' \
+                                    'the next parameter.')
         self.configs.add_param('chan_breakpoints', config_types.IntListList, \
-                        aliases=['cbp', 'chanbreakpoints', 'chanbp'], \
-                        nullable=True, \
-                        help='The breakpoints to use for defining piecewise ' \
-                            'segments of each channel when detrending. ' \
-                            'Multiple values will cause channels to be ' \
-                            'detrended multiple times in sequence, each ' \
-                            'time with the next list of breakpoints.')
+                               aliases=['cbp', 'chanbreakpoints', 'chanbp'], \
+                               nullable=True, \
+                               help='The breakpoints to use for defining piecewise ' \
+                                    'segments of each channel when de-trending. ' \
+                                    'Multiple values will cause channels to be ' \
+                                    'de-trended multiple times in sequence, each ' \
+                                    'time with the next list of breakpoints.')
         self.configs.add_param('chan_numpieces', config_types.IntList, \
-                        aliases=['cnp', 'channumpieces', 'channp'], \
-                        help='The number of equally sized peices to use for ' \
-                            'defining piecewise segments of each channel when '
-                            'detrending. Multiple values will cause channels ' \
-                            'to be detrended multiple times in sequence, each ' \
-                            'time with the next parameter.')
+                               aliases=['cnp', 'channumpieces', 'channp'], \
+                               help='The number of equally sized pieces to use ' \
+                                    'for defining piecewise segments of each ' \
+                                    'channel when de-trending. Multiple values ' \
+                                    'will cause channels to be de-trended multiple ' \
+                                    'times in sequence, each time with the next ' \
+                                    'parameter.')
         self.configs.add_param('subint_order', config_types.IntList, \
-                        aliases=['sorder', 'subintorder'], \
-                        help='The order of polynomial to remove from piecewise ' \
-                                'segements of each sub-int. Multiple values ' \
-                                'will cause sub-ints to be detrended multiple ' \
-                                'times in sequence, each time with the next ' \
-                                'parameter.')
+                               aliases=['sorder', 'subintorder'], \
+                               help='The order of polynomial to remove from ' \
+                                    'piecewise segments of each sub-int. ' \
+                                    'Multiple values will cause sub-ints to be ' \
+                                    'de-trended multiple times in sequence, ' \
+                                    'each time with the next parameter.')
         self.configs.add_param('subint_breakpoints', config_types.IntListList, \
-                        aliases=['sbp', 'subintbreakpoints', 'subintbp'], \
-                        nullable=True, \
-                        help='The breakpoints to use for defining piecewise ' \
-                            'segments of each sub-int when detrending. ' \
-                            'Multiple values will cause sub-ints to be ' \
-                            'detrended multiple times in sequence, each ' \
-                            'time with the next list of breakpoints.')
+                               aliases=['sbp', 'subintbreakpoints', 'subintbp'], \
+                               nullable=True, \
+                               help='The breakpoints to use for defining piecewise ' \
+                                    'segments of each sub-int when de-trending. ' \
+                                    'Multiple values will cause sub-ints to be ' \
+                                    'de-trended multiple times in sequence, each ' \
+                                    'time with the next list of breakpoints.')
         self.configs.add_param('subint_numpieces', config_types.IntList, \
-                        aliases=['snp', 'subintnumpieces', 'subintnp'], \
-                        help='The number of equally sized peices to use for ' \
-                            'defining piecewise segments of each sub-int when '
-                            'detrending. Multiple values will cause sub-ints ' \
-                            'to be detrended multiple times in sequence, each ' \
-                            'time with the next parameter.')
+                               aliases=['snp', 'subintnumpieces', 'subintnp'], \
+                               help='The number of equally sized peices to use for ' \
+                                    'defining piecewise segments of each sub-int '
+                                    'when de-trending. Multiple values will ' \
+                                    'cause sub-ints to be de-trended multiple ' \
+                                    'times in sequence, each time with the ' \
+                                    'next parameter.')
         self.configs.add_param('template', config_types.StrVal,
                                aliases=[],
                                nullable=True,
-                               help="Filename for a template to use yadayada")
+                               help='File name for a template to use by cleaner' \
+                                    'to be removed from the data prior to cleaning.')
         self.parse_config_string(config.cfg.surgical_default_params)
-
 
     def _clean(self, ar):
         patient = ar.clone()
         patient.pscrunch()
         patient.remove_baseline()
 
-        # Remove profile from dedispersed data
+        # Remove profile from dedispersed data.
         patient.dedisperse()
         data = patient.get_data().squeeze()
         if self.configs.template is None:
@@ -95,21 +96,21 @@ class SurgicalScrubCleaner(cleaners.BaseCleaner):
             template_ar.remove_baseline()
             template = np.apply_over_axes(np.sum, template_ar.get_data(), (0, 1)).squeeze()
             clean_utils.remove_profile_inplace(patient, template)
-        # re-set DM to 0
+        # Re-set DM to 0.
         patient.dededisperse()
 
-        # Get weights
+        # Get weights.
         weights = patient.get_weights()
-        # Get data (select first polarization - recall we already P-scrunched)
-        data = patient.get_data()[:,0,:,:]
+        # Get data (select first polarization - recall we already P-scrunched).
+        data = patient.get_data()[:, 0, :, :]
         data = clean_utils.apply_weights(data, weights)
 
-        # Mask profiles where weight is 0
+        # Mask profiles where weight is 0.
         mask_2d = np.bitwise_not(np.expand_dims(weights, 2).astype(bool))
         mask_3d = mask_2d.repeat(ar.get_nbin(), axis=2)
         data = np.ma.masked_array(data, mask=mask_3d)
 
-        # RFI-ectomy must be recommended by average of tests
+        # RFI-ectomy must be recommended by average of tests.
         avg_test_results = clean_utils.comprehensive_stats(data, axis=2, \
                                     chanthresh=self.configs.chanthresh, \
                                     subintthresh=self.configs.subintthresh, \
@@ -120,7 +121,7 @@ class SurgicalScrubCleaner(cleaners.BaseCleaner):
                                     subint_breakpoints=self.configs.subint_breakpoints, \
                                     subint_numpieces=self.configs.subint_numpieces, \
                                     )
-        for (isub, ichan) in np.argwhere(avg_test_results>=1):
+        for (isub, ichan) in np.argwhere(avg_test_results >= 1):
             # Be sure to set weights on the original archive, and
             # not the clone we've been working with.
             integ = ar.get_Integration(int(isub))
